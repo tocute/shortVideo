@@ -8,14 +8,11 @@
 import UIKit
 import AVKit
 
-
 class ViewController: UIViewController {
     var viewModel = ViewModel()
 
     private var currentIndex: Int = 0
     private var oldIndex: Int = 0
-    private var player: AVPlayer?
-    private var playerLayer: AVPlayerLayer?
     
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -23,10 +20,10 @@ class ViewController: UIViewController {
         layout.minimumLineSpacing = 0
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.isPagingEnabled = true
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(VideoCell.self, forCellWithReuseIdentifier: VideoCell.ReuseIdentifier)
+        collectionView.register(VideoCollectionViewCell.self, forCellWithReuseIdentifier: VideoCollectionViewCell.ReuseIdentifier)
+        collectionView.isPagingEnabled = true
         collectionView.showsVerticalScrollIndicator = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -52,14 +49,14 @@ class ViewController: UIViewController {
     private func playVideo(at index: Int) {
         guard index < viewModel.getVideoInfoCount() else { return }
         
-        if let cell = collectionView.cellForItem(at: IndexPath(item: Int(oldIndex), section: 0)) as? VideoCell {
+        if let cell = collectionView.cellForItem(at: IndexPath(item: Int(oldIndex), section: 0)) as? VideoCollectionViewCell {
             cell.player?.pause()
             cell.playerLayer?.removeFromSuperlayer()
             cell.playerLayer = nil
         }
             
         guard let url = viewModel.getVideoInfo(index: index)?.url,
-              let cell = collectionView.cellForItem(at: IndexPath(item: Int(index), section: 0)) as? VideoCell else { return }
+              let cell = collectionView.cellForItem(at: IndexPath(item: Int(index), section: 0)) as? VideoCollectionViewCell else { return }
         
         let player = AVPlayer(url: url)
         let playerLayer = AVPlayerLayer(player: player)
@@ -78,7 +75,7 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VideoCell.ReuseIdentifier, for: indexPath) as! VideoCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VideoCollectionViewCell.ReuseIdentifier, for: indexPath) as! VideoCollectionViewCell
         if let likeNumber = viewModel.getVideoInfo(index: indexPath.row)?.likeNumber {
             cell.updateLikeCount(likeNumber)
         }
@@ -100,8 +97,8 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
     }
 }
 
-extension ViewController: VideoCellDelegate {
-    func didTapLikeButton(cell: VideoCell) {
+extension ViewController: VideoCollectionViewCellDelegate {
+    func didTapLikeButton(cell: VideoCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         if var info = viewModel.getVideoInfo(index: indexPath.row) {
             info.likeNumber += 1
@@ -111,110 +108,4 @@ extension ViewController: VideoCellDelegate {
     }
 }
 
-protocol VideoCellDelegate: AnyObject {
-//    func didTapPlayButton(cell: VideoCell)
-    func didTapLikeButton(cell: VideoCell)
-}
 
-class VideoCell: UICollectionViewCell {
-    static let ReuseIdentifier = "VideoCell"
-    weak var delegate: VideoCellDelegate?
-    var playerLayer: AVPlayerLayer?
-    var player: AVPlayer?
-    var isVideoPlaying = true
-    let playButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-        button.tintColor = .white
-        
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    let likeButton: UIButton = {
-        let button = UIButton()
-        button.setImage(UIImage(systemName: "heart.fill"), for: .normal)
-        button.tintColor = .white
-        
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    let likeLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "0"
-        label.textColor = UIColor.white
-        label.font = UIFont.systemFont(ofSize: 17.0)
-        label.textAlignment = .left
-        return label
-    }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        backgroundColor = .black
-        setupViews()
-        playButton.addTarget(self, action: #selector(playButtonTapped), for: .touchUpInside)
-        likeButton.addTarget(self, action: #selector(likeButtonTapped), for: .touchUpInside)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    private func setupViews() {
-        contentView.addSubview(playButton)
-        contentView.addSubview(likeButton)
-        contentView.addSubview(likeLabel)
-        
-        NSLayoutConstraint.activate([
-            playButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            playButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            playButton.widthAnchor.constraint(equalToConstant: 50),
-            playButton.heightAnchor.constraint(equalToConstant: 50)
-        ])
-        
-        NSLayoutConstraint.activate([
-            likeButton.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10),
-            likeButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 20),
-            likeButton.widthAnchor.constraint(equalToConstant: 50),
-            likeButton.heightAnchor.constraint(equalToConstant: 50)
-        ])
-        
-        NSLayoutConstraint.activate([
-            likeLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10),
-            likeLabel.topAnchor.constraint(equalTo: likeButton.bottomAnchor, constant: 10),
-            likeLabel.widthAnchor.constraint(equalToConstant: 50),
-            likeLabel.heightAnchor.constraint(equalToConstant: 50)
-        ])
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        playerLayer?.removeFromSuperlayer()
-        playerLayer = nil
-    }
-    
-    func updateLikeCount(_ count: Int) {
-        likeLabel.text = "\(count)"
-    }
-    
-    @objc
-    private func playButtonTapped() {
-        if isVideoPlaying {
-            player?.pause()
-            playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
-        } else {
-            player?.play()
-            playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-        }
-        
-        isVideoPlaying.toggle()
-    }
-    
-    @objc
-    private func likeButtonTapped() {
-        delegate?.didTapLikeButton(cell: self)
-    }
-    
-}

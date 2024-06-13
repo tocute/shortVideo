@@ -17,6 +17,7 @@
 		E9008A832C1AFB3C0019C480 /* ShortVideoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9008A822C1AFB3C0019C480 /* ShortVideoUITests.swift */; };
 		E9008A852C1AFB3C0019C480 /* ShortVideoUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9008A842C1AFB3C0019C480 /* ShortVideoUITestsLaunchTests.swift */; };
 		E9008A9D2C1B023C0019C480 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9008A9C2C1B023C0019C480 /* ViewModel.swift */; };
+		E9008AB72C1B28F20019C480 /* VideoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9008AB62C1B28F20019C480 /* VideoCollectionViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		E9008A822C1AFB3C0019C480 /* ShortVideoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortVideoUITests.swift; sourceTree = "<group>"; };
 		E9008A842C1AFB3C0019C480 /* ShortVideoUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortVideoUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		E9008A9C2C1B023C0019C480 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
+		E9008AB62C1B28F20019C480 /* VideoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCollectionViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +107,7 @@
 				E9008A632C1AFB3A0019C480 /* SceneDelegate.swift */,
 				E9008A9C2C1B023C0019C480 /* ViewModel.swift */,
 				E9008A652C1AFB3A0019C480 /* ViewController.swift */,
+				E9008AB62C1B28F20019C480 /* VideoCollectionViewCell.swift */,
 				E9008A672C1AFB3A0019C480 /* Main.storyboard */,
 				E9008A6A2C1AFB3C0019C480 /* Assets.xcassets */,
 				E9008A6C2C1AFB3C0019C480 /* LaunchScreen.storyboard */,
@@ -264,6 +267,7 @@
 				E9008A662C1AFB3A0019C480 /* ViewController.swift in Sources */,
 				E9008A622C1AFB3A0019C480 /* AppDelegate.swift in Sources */,
 				E9008A9D2C1B023C0019C480 /* ViewModel.swift in Sources */,
+				E9008AB72C1B28F20019C480 /* VideoCollectionViewCell.swift in Sources */,
 				E9008A642C1AFB3A0019C480 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
