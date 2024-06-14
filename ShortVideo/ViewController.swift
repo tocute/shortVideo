@@ -10,7 +10,7 @@ import AVKit
 
 class ViewController: UIViewController {
     var viewModel = ViewModel()
-
+    var players = [AVPlayer]()
     private var currentIndex: Int = 0
     private var oldIndex: Int = 0
     
@@ -40,26 +40,31 @@ class ViewController: UIViewController {
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
+        
+        setupPlayers()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         playVideo(at: currentIndex)
     }
     
-    private func playVideo(at index: Int) {
-        guard index < viewModel.getVideoInfoCount() else { return }
-        
-        if let cell = collectionView.cellForItem(at: IndexPath(item: Int(oldIndex), section: 0)) as? VideoCollectionViewCell {
-            cell.player?.pause()
-            cell.playerLayer?.removeFromSuperlayer()
-            cell.playerLayer = nil
+    private func setupPlayers() {
+        players = viewModel.videoInfos.map { AVPlayer(url: $0.url!) }
+        for player in players {
+            player.currentItem?.preferredForwardBufferDuration = 5 // Buffer ahead duration
         }
+    }
+    
+    private func playVideo(at index: Int) {
+        guard index >= 0, index < viewModel.videoInfoCount() else { return }
+        
+        let prePlayer = players[oldIndex]
+        prePlayer.pause()
             
-        guard let url = viewModel.getVideoInfo(index: index)?.url,
-              let cell = collectionView.cellForItem(at: IndexPath(item: Int(index), section: 0)) as? VideoCollectionViewCell else { return }
+        guard let cell = collectionView.cellForItem(at: IndexPath(item: Int(index), section: 0)) as? VideoCollectionViewCell else { return }
         
         if cell.player == nil {
-            cell.player = AVPlayer(url: url)
+            cell.player = players[index]
         }
         let playerLayer = AVPlayerLayer(player: cell.player)
         cell.playerLayer = playerLayer
@@ -70,29 +75,35 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.getVideoInfoCount()
+        return viewModel.videoInfoCount()
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VideoCollectionViewCell.ReuseIdentifier, for: indexPath) as! VideoCollectionViewCell
-        if let info = viewModel.getVideoInfo(index: indexPath.row) {
+        if let info = viewModel.videoInfo(index: indexPath.row) {
             cell.updateVideoInfo(info)
         }
         cell.delegate = self
         return cell
     }
-    
+}
+
+extension ViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let visibleIndexPath = collectionView.indexPathsForVisibleItems.first else { return }
+
         if currentIndex != visibleIndexPath.item {
             oldIndex = currentIndex
             currentIndex = visibleIndexPath.item
+            
             playVideo(at: currentIndex)
         }
     }
-    
+}
+
+extension ViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return collectionView.bounds.size
     }
@@ -101,8 +112,7 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
 extension ViewController: VideoCollectionViewCellDelegate {
     func didTapLikeButton(cell: VideoCollectionViewCell, videoInfo: VideoInfo) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        
         viewModel.updateVideoInfo(index: indexPath.row, info: videoInfo)
     }
 }
-
-

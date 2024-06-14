@@ -17,25 +17,23 @@ struct VideoInfo {
 
 struct ViewModel {
     
-    var videoInfo: [VideoInfo] = [
+    var videoInfos: [VideoInfo] = [
         VideoInfo(url: URL(string: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"), title: "title 1", isLiked: false, likeNumber: 210, author: "Alex"),
         VideoInfo(url: URL(string: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"), title: "title 2", isLiked: true, likeNumber: 452, author: "Bill"),
-        VideoInfo(url: URL(string: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"), title: "title 3", isLiked: false, likeNumber: 193, author: "Cindy"),
-        VideoInfo(url: URL(string: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4"), title: "title 4", isLiked: true, likeNumber: 452, author: "David"),
-        VideoInfo(url: URL(string: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4"), title: "title 5", isLiked: false, likeNumber: 193, author: "Emma")
+        VideoInfo(url: URL(string: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"), title: "title 3", isLiked: false, likeNumber: 193, author: "Cindy")
     ]
     
-    func getVideoInfoCount() -> Int {
-        return videoInfo.count
+    func videoInfoCount() -> Int {
+        return videoInfos.count
     }
     
-    func getVideoInfo(index: Int) -> VideoInfo? {
-        guard index >= 0, index < videoInfo.count else { return nil }
-        return videoInfo[index]
+    func videoInfo(index: Int) -> VideoInfo? {
+        guard videoInfos.indices.contains(index) else { return nil }
+        return videoInfos[index]
     }
     
     mutating func updateVideoInfo(index: Int, info: VideoInfo) {
-        guard index >= 0, index < videoInfo.count else { return }
-        videoInfo[index] = info
+        guard videoInfos.indices.contains(index) else { return }
+        videoInfos[index] = info
     }
 }

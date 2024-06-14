@@ -39,11 +39,11 @@ class VideoCollectionViewCell: UICollectionViewCell {
     
     let likeLabel: UILabel = {
         let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "0"
         label.textColor = .white
         label.font = .systemFont(ofSize: 17.0)
         label.textAlignment = .left
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -92,19 +92,14 @@ class VideoCollectionViewCell: UICollectionViewCell {
         super.prepareForReuse()
 
         player?.pause()
-        playerLayer?.removeFromSuperlayer()
-        playerLayer = nil
     }
     
     func updateVideoInfo(_ info: VideoInfo) {
         videoInfo = info
 
-        if let url = info.url {
-            player = AVPlayer(url: url)
-        }
-        
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
+            
             self.likeLabel.text = "\(info.likeNumber)"
             isVideoPlaying = true
             self.playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
