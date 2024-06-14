@@ -65,7 +65,7 @@ class ViewController: UIViewController {
         cell.playerLayer?.frame = cell.contentView.bounds
         cell.contentView.layer.insertSublayer(playerLayer, at: 0)
         
-        cell.player?.play()
+        cell.playVideo()
     }
 }
 
@@ -76,8 +76,8 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: VideoCollectionViewCell.ReuseIdentifier, for: indexPath) as! VideoCollectionViewCell
-        if let likeNumber = viewModel.getVideoInfo(index: indexPath.row)?.likeNumber {
-            cell.updateLikeCount(likeNumber)
+        if let info = viewModel.getVideoInfo(index: indexPath.row) {
+            cell.updateVideoInfo(info)
         }
         cell.delegate = self
         return cell
@@ -98,13 +98,9 @@ extension ViewController: UICollectionViewDataSource, UICollectionViewDelegate, 
 }
 
 extension ViewController: VideoCollectionViewCellDelegate {
-    func didTapLikeButton(cell: VideoCollectionViewCell) {
+    func didTapLikeButton(cell: VideoCollectionViewCell, videoInfo: VideoInfo) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        if var info = viewModel.getVideoInfo(index: indexPath.row) {
-            info.likeNumber += 1
-            viewModel.updateVideoInfo(index: currentIndex, info: info)
-            collectionView.reloadData()
-        }
+        viewModel.updateVideoInfo(index: indexPath.row, info: videoInfo)
     }
 }
 

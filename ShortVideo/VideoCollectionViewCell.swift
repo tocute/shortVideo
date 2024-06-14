@@ -10,7 +10,7 @@ import AVKit
 
 protocol VideoCollectionViewCellDelegate: AnyObject {
 //    func didTapPlayButton(cell: VideoCollectionViewCell)
-    func didTapLikeButton(cell: VideoCollectionViewCell)
+    func didTapLikeButton(cell: VideoCollectionViewCell, videoInfo: VideoInfo)
 }
 
 class VideoCollectionViewCell: UICollectionViewCell {
@@ -19,6 +19,8 @@ class VideoCollectionViewCell: UICollectionViewCell {
     var playerLayer: AVPlayerLayer?
     var player: AVPlayer?
     var isVideoPlaying = true
+    var videoInfo = VideoInfo(url: nil, title: "", isLiked: false, likeNumber: 0, author: "")
+    
     let playButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "pause.fill"), for: .normal)
@@ -88,15 +90,33 @@ class VideoCollectionViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        
-        isVideoPlaying = true
+
         player?.pause()
         playerLayer?.removeFromSuperlayer()
         playerLayer = nil
     }
     
-    func updateLikeCount(_ count: Int) {
-        likeLabel.text = "\(count)"
+    func updateVideoInfo(_ info: VideoInfo) {
+        videoInfo = info
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.likeLabel.text = "\(info.likeNumber)"
+            isVideoPlaying = true
+            self.playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
+            if self.videoInfo.isLiked {
+                let imageIcon = UIImage(systemName: "heart.fill")?.withTintColor(.red, renderingMode: .alwaysOriginal)
+                self.likeButton.setImage(imageIcon, for: .normal)
+            } else {
+                self.likeButton.setImage(UIImage(systemName: "heart.fill"), for: .normal)
+            }
+        }
+    }
+    
+    func playVideo() {
+        isVideoPlaying = true
+        player?.play()
+        playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
     }
     
     @objc
@@ -111,9 +131,19 @@ class VideoCollectionViewCell: UICollectionViewCell {
         
         isVideoPlaying.toggle()
     }
-    
+
     @objc
     private func likeButtonTapped() {
-        delegate?.didTapLikeButton(cell: self)
+        videoInfo.isLiked.toggle()
+        if videoInfo.isLiked {
+            videoInfo.likeNumber += 1
+            let imageIcon = UIImage(systemName: "heart.fill")?.withTintColor(.red, renderingMode: .alwaysOriginal)
+            likeButton.setImage(imageIcon, for: .normal)
+        } else {
+            videoInfo.likeNumber -= 1
+            likeButton.setImage(UIImage(systemName: "heart.fill"), for: .normal)
+        }
+        likeLabel.text = "\(videoInfo.likeNumber)"
+        delegate?.didTapLikeButton(cell: self,videoInfo: videoInfo)
     }
 }
