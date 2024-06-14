@@ -99,6 +99,10 @@ class VideoCollectionViewCell: UICollectionViewCell {
     func updateVideoInfo(_ info: VideoInfo) {
         videoInfo = info
 
+        if let url = info.url {
+            player = AVPlayer(url: url)
+        }
+        
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             self.likeLabel.text = "\(info.likeNumber)"

@@ -58,9 +58,10 @@ class ViewController: UIViewController {
         guard let url = viewModel.getVideoInfo(index: index)?.url,
               let cell = collectionView.cellForItem(at: IndexPath(item: Int(index), section: 0)) as? VideoCollectionViewCell else { return }
         
-        let player = AVPlayer(url: url)
-        let playerLayer = AVPlayerLayer(player: player)
-        cell.player = player
+        if cell.player == nil {
+            cell.player = AVPlayer(url: url)
+        }
+        let playerLayer = AVPlayerLayer(player: cell.player)
         cell.playerLayer = playerLayer
         cell.playerLayer?.frame = cell.contentView.bounds
         cell.contentView.layer.insertSublayer(playerLayer, at: 0)
