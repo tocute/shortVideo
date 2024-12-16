@@ -16,6 +16,10 @@ class ReferenceCycle {
     deinit {
         print("\(message) is being deallocated")
     }
+    
+    func sum(num1: Int, num2: Int) -> Int {
+        return num1 - num2
+    }
 }
 
 // Create an instance of ReferenceCycle
